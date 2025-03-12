@@ -1,0 +1,42 @@
+name: Laravel Code Linting
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  lint:
+    name: Code Linting
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set Up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          tools: composer
+
+      - name: Clear Cache
+        run: composer clear-cache
+
+      - name: Install Dependencies
+        run: composer install --prefer-dist --no-progress --no-suggest
+
+      - name: Verify Composer Dependencies
+        run: ls -la vendor/bin
+
+      - name: Install PHP_CodeSniffer
+        run: composer require --dev squizlabs/php_codesniffer
+
+      - name: Verify PHP_CodeSniffer Installation
+        run: vendor/bin/phpcs --version
+
+      - name: Run PHP Code Linter
+        run: vendor/bin/phpcs --standard=PSR12 app/ routes/ database/
